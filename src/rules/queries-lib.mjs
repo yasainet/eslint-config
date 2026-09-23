@@ -5,9 +5,6 @@ const FEATURES_DIR = "/src/features/";
 const LIB_DIR = "src/lib";
 const SUPABASE_NAMES = ["server", "client", "admin"];
 
-// src/lib から { queries の file 名: 対応する import } を作る
-// - supabase: server.ts, client.ts, admin.ts だけ
-// - それ以外: index.ts を持つ folder の名前
 function readLibMapping(libDir) {
   const mapping = {};
   if (!fs.existsSync(libDir)) return mapping;
