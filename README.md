@@ -1,4 +1,4 @@
-# @yasainet/eslint
+# @yasainet/eslint-config
 
 ## Setup
 

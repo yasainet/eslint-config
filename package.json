@@ -1,7 +1,7 @@
 {
-  "name": "@yasainet/eslint",
-  "version": "0.0.1",
-  "description": "@yasainet/eslint",
+  "name": "@yasainet/eslint-config",
+  "version": "0.1.0",
+  "description": "@yasainet/eslint-config",
   "main": "src/index.mjs",
   "types": "src/index.d.mts",
   "files": [
@@ -18,14 +18,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yasainet/eslint.git"
+    "url": "git+https://github.com/yasainet/eslint-config.git"
   },
   "keywords": [],
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/yasainet/eslint/issues"
+    "url": "https://github.com/yasainet/eslint-config/issues"
   },
-  "homepage": "https://github.com/yasainet/eslint#readme",
+  "homepage": "https://github.com/yasainet/eslint-config#readme",
   "dependencies": {
     "eslint-plugin-better-tailwindcss": "^4.7.0",
     "eslint-plugin-check-file": "^3.3.2",

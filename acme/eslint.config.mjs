@@ -1,4 +1,4 @@
-import yasainetConfig from "@yasainet/eslint";
+import yasainetConfig from "@yasainet/eslint-config";
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
