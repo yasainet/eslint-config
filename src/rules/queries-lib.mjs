@@ -3,7 +3,7 @@ import path from "path";
 
 const FEATURES_DIR = "/src/features/";
 const LIB_DIR = "src/lib";
-const SUPABASE_NAMES = ["server", "client", "admin"];
+const SUPABASE_NAMES = ["server", "client", "admin", "anon"];
 
 function readLibMapping(libDir) {
   const mapping = {};

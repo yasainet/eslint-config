@@ -2,10 +2,12 @@ const FILE_PATTERN =
   /\/src\/features\/[^/]+\/(services|loaders|actions|hooks)\/([^/]+)\.ts$/;
 const IMPORT_PATTERN =
   /^@\/features\/[^/]+\/(queries|services|loaders|actions)\/([^/]+)$/;
-const SCOPES = ["server", "client", "admin"];
+const SCOPES = ["server", "client", "admin", "anon"];
 
 function toScope(name) {
-  return name === "client" || name === "admin" ? name : "server";
+  return name === "client" || name === "admin" || name === "anon"
+    ? name
+    : "server";
 }
 
 export default {
@@ -13,11 +15,13 @@ export default {
     type: "problem",
     messages: {
       invalidFileName:
-        "{{ layer }} cannot use the file name '{{ name }}'. It can use only server, client or admin.",
+        "{{ layer }} cannot use the file name '{{ name }}'. It can use only server, client, admin or anon.",
       mixed:
         "{{ importer }} cannot import '{{ importPath }}'. A browser file (client) and a server file cannot be mixed.",
       adminOnly:
         "{{ importer }} cannot import '{{ importPath }}'. Only admin.ts can import admin.",
+      anonOnly:
+        "{{ importer }} cannot import '{{ importPath }}'. anon.ts can import only anon. A public (anon) file cannot read cookies or use admin.",
     },
     schema: [],
   },
@@ -57,6 +61,8 @@ export default {
 
       if ((scope === "client") !== (importedScope === "client")) {
         context.report({ node: source, messageId: "mixed", data });
+      } else if (scope === "anon" && importedScope !== "anon") {
+        context.report({ node: source, messageId: "anonOnly", data });
       } else if (scope === "server" && importedScope === "admin") {
         context.report({ node: source, messageId: "adminOnly", data });
       }
