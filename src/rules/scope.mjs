@@ -1,7 +1,9 @@
+import { DEFAULT_ALIASES, stripAlias } from "../options.mjs";
+
 const FILE_PATTERN =
   /\/src\/features\/[^/]+\/(services|loaders|actions|hooks)\/([^/]+)\.ts$/;
 const IMPORT_PATTERN =
-  /^@\/features\/[^/]+\/(queries|services|loaders|actions)\/([^/]+)$/;
+  /^features\/[^/]+\/(queries|services|loaders|actions)\/([^/]+)$/;
 const SCOPES = ["server", "client", "admin", "anon"];
 
 function toScope(name) {
@@ -23,9 +25,18 @@ export default {
       anonOnly:
         "{{ importer }} cannot import '{{ importPath }}'. anon.ts can import only anon. A public (anon) file cannot read cookies or use admin.",
     },
-    schema: [],
+    schema: [
+      {
+        type: "object",
+        properties: {
+          aliases: { type: "array", items: { type: "string" } },
+        },
+        additionalProperties: false,
+      },
+    ],
   },
   create(context) {
+    const aliases = context.options[0]?.aliases ?? DEFAULT_ALIASES;
     const fileMatch = FILE_PATTERN.exec(context.filename);
     if (!fileMatch) return {};
 
@@ -50,7 +61,9 @@ export default {
       if (!source || typeof source.value !== "string") return;
       const importPath = source.value;
 
-      const importMatch = IMPORT_PATTERN.exec(importPath);
+      const rest = stripAlias(importPath, aliases);
+      if (rest === null) return;
+      const importMatch = IMPORT_PATTERN.exec(rest);
       if (!importMatch) return;
 
       const [, importedLayer, importedName] = importMatch;

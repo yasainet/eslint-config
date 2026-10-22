@@ -2,7 +2,8 @@ import checkFile from "eslint-plugin-check-file";
 
 import plugin from "./plugin.mjs";
 
-export default [
+export function createNaming({ typesPath }) {
+  return [
   {
     name: "naming/filename",
     files: ["src/**/*.{ts,tsx}"],
@@ -37,7 +38,7 @@ export default [
     files: ["src/features/**/*.{ts,tsx}"],
     plugins: { yasainet: plugin },
     rules: {
-      "yasainet/feature-name": "error",
+      "yasainet/feature-name": ["error", { typesPath }],
     },
   },
   {
@@ -49,3 +50,4 @@ export default [
     },
   },
 ];
+}

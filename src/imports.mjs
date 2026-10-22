@@ -1,16 +1,19 @@
+import { aliasPrefix } from "./options.mjs";
 import plugin from "./plugin.mjs";
 
 const feature = (...layers) => `features/[^/]+/(?:${layers.join("|")})/`;
-const allow = (...paths) => `^@/(?!${paths.join("|")})`;
 
-export default [
+export function createImports({ aliases }) {
+  const allow = (...paths) => `^${aliasPrefix(aliases)}(?!${paths.join("|")})`;
+
+  return [
   {
     name: "imports/path",
     files: ["src/**/*.{ts,tsx}"],
     plugins: { yasainet: plugin },
     rules: {
       "yasainet/no-parent-import": "error",
-      "yasainet/namespace-import-name": "error",
+      "yasainet/namespace-import-name": ["error", { aliases }],
     },
   },
   {
@@ -54,7 +57,7 @@ export default [
     files: ["src/features/*/queries/*.ts"],
     plugins: { yasainet: plugin },
     rules: {
-      "yasainet/queries-lib": "error",
+      "yasainet/queries-lib": ["error", { aliases }],
       "no-restricted-imports": [
         "error",
         {
@@ -282,3 +285,4 @@ export default [
     },
   },
 ];
+}

@@ -55,7 +55,13 @@ export default {
       invalidFeatureName:
         "features cannot use the name '{{ name }}'. It can use only a Supabase table name or auth ({{ allowed }}).",
     },
-    schema: [],
+    schema: [
+      {
+        type: "object",
+        properties: { typesPath: { type: "string" } },
+        additionalProperties: false,
+      },
+    ],
   },
   create(context) {
     const filename = context.filename;
@@ -63,7 +69,12 @@ export default {
     if (idx === -1) return {};
 
     const name = filename.slice(idx + FEATURES_DIR.length).split("/")[0];
-    const typesPath = path.join(filename.slice(0, idx), TYPES_PATH);
+    // monorepo では型 file が別 package (core) にあるので、cwd 相対で指定できる
+    const option = context.options[0]?.typesPath;
+    const typesPath =
+      option === undefined
+        ? path.join(filename.slice(0, idx), TYPES_PATH)
+        : path.resolve(context.cwd, option);
 
     const allowed = [
       "auth",
