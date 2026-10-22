@@ -25,9 +25,13 @@ export function createImports({ aliases }) {
         {
           patterns: [
             {
-              regex: allow("configs/", feature("configs")),
+              regex: allow(
+                "lib/[^/]+/(?:types|database)$",
+                "configs/",
+                feature("configs"),
+              ),
               message:
-                "lib can import only ./ (same folder) and configs. lib cannot import other @/.",
+                "lib can import only ./ (same folder), @/lib/*/types, @/lib/*/database and configs. lib cannot import other @/.",
             },
           ],
         },
