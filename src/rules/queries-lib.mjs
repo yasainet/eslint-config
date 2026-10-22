@@ -7,6 +7,7 @@ const FEATURES_DIR = "/src/features/";
 const LIB_DIR = "src/lib";
 const SUPABASE_NAMES = ["server", "client", "admin", "anon"];
 
+/** queries の file 名 → `lib/...` (alias を除いた path)。alias は aliases のどれでもよい */
 function readLibMapping(libDir) {
   const mapping = {};
   if (!fs.existsSync(libDir)) return mapping;
@@ -17,11 +18,11 @@ function readLibMapping(libDir) {
     if (entry.name === "supabase") {
       for (const name of SUPABASE_NAMES) {
         if (fs.existsSync(path.join(libDir, "supabase", `${name}.ts`))) {
-          mapping[name] = `@/lib/supabase/${name}`;
+          mapping[name] = `lib/supabase/${name}`;
         }
       }
     } else if (fs.existsSync(path.join(libDir, entry.name, "index.ts"))) {
-      mapping[entry.name] = `@/lib/${entry.name}`;
+      mapping[entry.name] = `lib/${entry.name}`;
     }
   }
   return mapping;
@@ -54,7 +55,9 @@ export default {
 
     const mapping = readLibMapping(path.join(filename.slice(0, idx), LIB_DIR));
     const name = path.basename(filename, ".ts");
-    const expected = mapping[name];
+    const expectedRest = mapping[name];
+    const expected =
+      expectedRest === undefined ? undefined : `${aliases[0]}${expectedRest}`;
 
     if (!expected) {
       return {
@@ -72,7 +75,7 @@ export default {
       const importPath = source.value;
 
       const rest = stripAlias(importPath, aliases);
-      if (rest !== null && rest.startsWith("lib/") && importPath !== expected) {
+      if (rest !== null && rest.startsWith("lib/") && rest !== expectedRest) {
         context.report({
           node: source,
           messageId: "invalidLibImport",
