@@ -19,7 +19,7 @@ export default {
       invalidFileName:
         "{{ layer }} cannot use the file name '{{ name }}'. It can use only server, client, admin or anon.",
       mixed:
-        "{{ importer }} cannot import '{{ importPath }}'. A browser file (client) and a server file cannot be mixed.",
+        "{{ importer }} cannot import '{{ importPath }}'. A browser file (client) can import only client and anon. A server file cannot import client.",
       adminOnly:
         "{{ importer }} cannot import '{{ importPath }}'. Only admin.ts can import admin.",
       anonOnly:
@@ -72,7 +72,11 @@ export default {
       const importedScope = toScope(importedName);
       const data = { importer, importPath };
 
-      if ((scope === "client") !== (importedScope === "client")) {
+      // client は client と anon を import できる。anon は secret も cookie も持たない公開の読み取りで、
+      // browser や app (React Native) で動かしても漏れるものが無い
+      const importedIsClientSafe =
+        importedScope === "client" || importedScope === "anon";
+      if (scope === "client" ? !importedIsClientSafe : importedScope === "client") {
         context.report({ node: source, messageId: "mixed", data });
       } else if (scope === "anon" && importedScope !== "anon") {
         context.report({ node: source, messageId: "anonOnly", data });
