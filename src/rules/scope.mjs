@@ -19,7 +19,7 @@ export default {
       invalidFileName:
         "{{ layer }} cannot use the file name '{{ name }}'. It can use only server, client, admin or anon.",
       mixed:
-        "{{ importer }} cannot import '{{ importPath }}'. A browser file (client) can import only client and anon. A server file cannot import client.",
+        "{{ importer }} cannot import '{{ importPath }}'. A browser file (client) and a server file cannot be mixed (anon is allowed for client only with clientCanImportAnon).",
       adminOnly:
         "{{ importer }} cannot import '{{ importPath }}'. Only admin.ts can import admin.",
       anonOnly:
@@ -30,6 +30,7 @@ export default {
         type: "object",
         properties: {
           aliases: { type: "array", items: { type: "string" } },
+          clientCanImportAnon: { type: "boolean" },
         },
         additionalProperties: false,
       },
@@ -37,6 +38,8 @@ export default {
   },
   create(context) {
     const aliases = context.options[0]?.aliases ?? DEFAULT_ALIASES;
+    const clientCanImportAnon =
+      context.options[0]?.clientCanImportAnon ?? false;
     const fileMatch = FILE_PATTERN.exec(context.filename);
     if (!fileMatch) return {};
 
@@ -72,10 +75,12 @@ export default {
       const importedScope = toScope(importedName);
       const data = { importer, importPath };
 
-      // client は client と anon を import できる。anon は secret も cookie も持たない公開の読み取りで、
-      // browser や app (React Native) で動かしても漏れるものが無い
+      // 既定では client は client しか import できない (Next.js は公開 data も server の loaders を通す)。
+      // server を持たない app (React Native) は clientCanImportAnon で anon を許す。
+      // anon は secret も cookie も持たない公開の読み取りで、端末で動かしても漏れるものが無い
       const importedIsClientSafe =
-        importedScope === "client" || importedScope === "anon";
+        importedScope === "client" ||
+        (clientCanImportAnon && importedScope === "anon");
       if (scope === "client" ? !importedIsClientSafe : importedScope === "client") {
         context.report({ node: source, messageId: "mixed", data });
       } else if (scope === "anon" && importedScope !== "anon") {

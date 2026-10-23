@@ -6,6 +6,8 @@
  * - typesPath: feature 名の元になる Supabase の型 file。cwd 相対。
  *   省略時は file から見た `<root>/src/lib/supabase/types.ts`
  * - tailwindcss: false で tailwind の rule を外す (globals.css が無い package)
+ * - clientCanImportAnon: true で client の file が anon を import できる。server を持たない app (React Native) 用。
+ *   Next.js の project は既定 (false) のまま、公開 data も server の loaders を通す
  */
 export const DEFAULT_ALIASES = ["@/"];
 
@@ -14,6 +16,7 @@ export function resolveOptions(options = {}) {
     aliases: options.aliases ?? DEFAULT_ALIASES,
     typesPath: options.typesPath,
     tailwindcss: options.tailwindcss ?? true,
+    clientCanImportAnon: options.clientCanImportAnon ?? false,
   };
 }
 
